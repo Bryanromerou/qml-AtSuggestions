@@ -4,7 +4,7 @@ Item {
     id: root
     property var user: null
     property int index: 0
-    signal clicked(var user)
+    signal clicked(var user, var index)
     height: 20
     width:parent.width
     Rectangle{
@@ -21,7 +21,7 @@ Item {
         MouseArea{
             anchors.fill: parent
             onClicked: {
-                root.clicked(user)
+                root.clicked(user,index)
             }
         }
     }
