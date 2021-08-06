@@ -2,5 +2,8 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>SearchResult.qml</file>
+        <file>UsingTextInput.qml</file>
+        <file>UsingTextEdit.qml</file>
+        <file>Newest.qml</file>
     </qresource>
 </RCC>

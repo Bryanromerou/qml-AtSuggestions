@@ -9,9 +9,9 @@ Item {
     width:parent.width
     Rectangle{
         anchors.fill: parent
-        color: "blue"
+        color: "gray"
         border.width: 1
-        border.color: "red"
+//        border.color: "red"
         Text {
             color:"white"
             id: screenName
