@@ -83,35 +83,25 @@ Window {
         suggestions.height = 0
         searchResultsElm = []
     }
-    function colorText(){
+    function colorText(finalCursorPosition = null){
         let tempText = ""
         const wordArr = txtPlain.getText(0,500).split(" ")
-        let skip = 0
-        const newWordArr = wordArr.map((word,idx)=>{
-            let added = false
+        const newWordArr = []
+        wordArr.forEach((word,idx)=>{
             let tempWord = word
+            let skip = false
             allAts.forEach((elm)=>{
-                console.debug(elm.wordIdx)
-                if( !added && elm.wordIdx === idx){
-                    added = true
+                if( elm.wordIdx === idx)
                     tempWord = "@" + addSpecialText(elm.text)
-                }
+                else if(elm.wordIdx+elm.wordCount-1 >= idx && elm.wordIdx < idx)
+                    skip = true
             })
-
-            return tempWord
+            if(!skip)
+                newWordArr.push(tempWord)
         })
+        console.log(newWordArr.join(" "))
         txtPlain.text = newWordArr.join(" ")
         txtPlain.cursorPosition = txtPlain.getText(0,500).length
-    }
-    function pushBeginBack(spaces = 1){
-        allAts = allAts.map((elm)=>{
-            if(txtPlain.cursorPosition<elm.begin){
-                const newElm = elm
-                newElm.begin -= spaces
-                return newElm
-            }
-            return elm
-        })
     }
 
     function addSpecialText(originalText){
@@ -120,10 +110,19 @@ Window {
 
     function deleteAt(element){
         const plainText = txtPlain.getText(0,500)
-        txtPlain.text = plainText.slice(0,element.begin) + plainText.slice(element.begin+element.length-1)
-        txtPlain.cursorPosition = element.begin + 1
+        const wordArr = plainText.split(" ")
+        wordArr.forEach((elm,idx)=>{
+            console.debug(`1.) ${elm}`)
+        })
+        wordArr.splice(element.wordIdx,element.wordCount)
+        wordArr.forEach((elm,idx)=>{
+            console.debug(`2.) ${elm}`)
+        })
+        console.debug(wordArr.join(" "))
+        txtPlain.text = wordArr.join(" ")
         allAts = allAts.filter((at) => at.key !== element.key)
-        pushBeginBack()
+        console.debug(element.begin)
+        colorText(element.begin)
     }
 
     function findWordIndexOfCursor(words, cursorPosition){
@@ -140,7 +139,7 @@ Window {
         let returnIndex = -1
         words.forEach((elm,idx)=>{
             if(newCursorPosition > letterCount && newCursorPosition<=letterCount+elm.length){
-                console.debug(`The word your touching is ${elm} and the position is ${idx}`)
+//                console.debug(`The word your touching is ${elm} and the position is ${idx}`)
                 returnIndex = idx
             }
             letterCount += elm.length
@@ -186,15 +185,14 @@ Window {
                             deleteAt(elm)
                         }
                     })
-                    console.debug(allAts.length)
                 }
             }
             onTextChanged: {
+                console.debug(getText(0,500))
                 var words = getText(0,500).split(" ") //Splits the text into an array of words
                 totalWords = words.length
                 var result = words[words.length-1].match(/^@.*/); // Saves the last @ to result
                 wordIdx = findWordIndexOfCursor(words,txtPlain.cursorPosition);
-//                console.debug(`${wordIdx} ==  wordIdx`)
                 resultSize =  result ? result[0].length : 0
                 atFlag = Boolean(result)
                 if(result){
