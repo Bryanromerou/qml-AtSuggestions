@@ -43,6 +43,8 @@ Window {
     property var allAts: []
     property int wordIdx: 0
     property int totalWords: 0
+    property var currText: ""
+    property int lastPos: 0
 
 
     function searchElmClicked( user, index)
@@ -168,9 +170,22 @@ Window {
 
     function pushBeginBack(spaces = 1){
         allAts = allAts.map((elm)=>{
-            if(txtPlain.cursorPosition<elm.begin){
+            if(lastPos<elm.begin){
                 const newElm = elm
                 newElm.begin -= spaces
+                return newElm
+            }
+            return elm
+        })
+    }
+
+    function pushBeginForwards(spaces = 1,currPos){
+        console.debug("pushing the begin forward")
+        allAts = allAts.map((elm)=>{
+            console.debug(`Cursor Postion == ${currPos} and the ${elm.begin}`)
+            if(lastPos<elm.begin){
+                const newElm = elm
+                newElm.begin += spaces
                 return newElm
             }
             return elm
@@ -199,7 +214,10 @@ Window {
 
     function findWordTouchingCursor(words, cursorPosition){
         const plainText = txtPlain.getText(0,500)
-
+//        console.debug(`Before == "${plainText[cursorPosition]}" and After == "${plainText[cursorPosition]}"`)
+//        if (plainText[cursorPosition] === " " && plainText[cursorPosition] === " " ){
+//            return " "
+//        }
         let newCursorPosition = cursorPosition
         for(let i=0;i<cursorPosition; i++){
             if (plainText[i]===" " && i<cursorPosition-1)
@@ -252,23 +270,30 @@ Window {
                     const rawText = txtPlain.text.match(/<p(?: [^>]*)?>(.*?)<\/p>/)[0]
                     allAts.forEach((elm,idx)=>{
                         if(elm.begin+elm.length === txtPlain.cursorPosition){
-                            console.debug(`The name we are trying to remove is ${elm.text} and its index in the array is ${idx} and it begins at ${elm.begin}`)
                             deleteAt(idx)
                         }else if(elm.begin <= txtPlain.cursorPosition && elm.begin+elm.length >= txtPlain.cursorPosition){
-//                           console.debug("Should break link")
                            breakLink(idx,txtPlain.cursorPosition-elm.begin, txtPlain.cursorPosition)
                         }
                     })
                 }
             }
+            onCursorPositionChanged: {
+                console.debug(`The cursor position is now ${cursorPosition}`)
+                lastPos = cursorPosition
+            }
 
             onTextChanged: {
-                var words = getText(0,500).split(" ") //Splits the text into an array of words
-                console.debug(findWordTouchingCursor(words,txtPlain.cursorPosition))
+                const textOnly = getText(0,500)
+                var words = textOnly.split(" ") //Splits the text into an array of words
                 totalWords = words.length
-//                allAts.forEach(elm=>{
-//                    console.debug(`${elm.text} \n Begin: ${elm.begin} --- End:${elm.begin+elm.length}`)
-//                })
+                if(currText<textOnly.length && textOnly.length - currText<= 1)
+                    pushBeginForwards(1,cursorPosition)
+                else if(currText>textOnly.length && currText - textOnly.length<= 1)
+                    pushBeginBack(1)
+                currText = textOnly.length
+                allAts.forEach(elm=>{
+                    console.debug(`${elm.text} \n Begin: ${elm.begin} --- End:${elm.begin+elm.length}`)
+                })
 
                 var result = findWordTouchingCursor(words,txtPlain.cursorPosition);
                 atFlag = result[0] === "@"
@@ -307,6 +332,7 @@ Window {
                     searchResults = []
                     clearSearchResultElm()
                 }
+
             }
         }
     }
