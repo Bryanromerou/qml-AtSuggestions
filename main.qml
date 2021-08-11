@@ -67,7 +67,7 @@ Window {
         })
 
         allAts.push({
-            "begin":croppedText.length-1,
+            "begin":txtPlain.cursorPosition-txtPlain.resultSize,
             "length": regularText.length + 1,
             "text": regularText,
             "wordIdx": wordIdx,
@@ -250,10 +250,9 @@ Window {
             Keys.onPressed: {
                 if(event.key === 16777219){
                     const rawText = txtPlain.text.match(/<p(?: [^>]*)?>(.*?)<\/p>/)[0]
-//                    console.debug(`Cursor Position === ${txtPlain.cursorPosition}`)
                     allAts.forEach((elm,idx)=>{
                         if(elm.begin+elm.length === txtPlain.cursorPosition){
-//                            console.debug(`The name we are trying to remove is ${elm.text} and its index in the array is ${idx}`)
+                            console.debug(`The name we are trying to remove is ${elm.text} and its index in the array is ${idx} and it begins at ${elm.begin}`)
                             deleteAt(idx)
                         }else if(elm.begin <= txtPlain.cursorPosition && elm.begin+elm.length >= txtPlain.cursorPosition){
 //                           console.debug("Should break link")
@@ -263,7 +262,6 @@ Window {
                 }
             }
 
-            // /@<span(?: [^>]*)?>(.*?)<\/span>/g
             onTextChanged: {
                 var words = getText(0,500).split(" ") //Splits the text into an array of words
                 console.debug(findWordTouchingCursor(words,txtPlain.cursorPosition))
