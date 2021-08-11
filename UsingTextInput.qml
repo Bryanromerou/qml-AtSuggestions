@@ -68,6 +68,8 @@ Window {
         return `${originalText}`
     }
 
+
+
     Rectangle{
         id:suggestions
         width: frame.width
