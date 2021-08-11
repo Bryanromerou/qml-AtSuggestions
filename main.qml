@@ -91,7 +91,7 @@ Window {
         searchResultsElm.push(temp)
     }
 
-    function clearSearchResultElm (){
+    function clearSearchResultElm (){ // Function Closes Suggestion Menu
         searchResultsElm.forEach((elm)=>{
             elm.destroy()
         })
@@ -119,11 +119,11 @@ Window {
         txtPlain.cursorPosition = txtPlain.getText(0,500).length
     }
 
-    function addSpecialText(originalText){
+    function addSpecialText(originalText){ // Function takes in string and returns string back with color span tag
         return `<font color=\"#0000FF\">${originalText}</font>`
     }
 
-    function deleteAt(index){
+    function deleteAt(index){ // Function removes the @ at certain index, corresponding to the allAts array from the TextInput
         const plainText = txtPlain.getText(0,500)
 
         var rawText = ""
@@ -146,19 +146,19 @@ Window {
         txtPlain.cursorPosition = txtPlain.getText(0,500).length
     }
 
-    function breakLink(index, relativeIndex, mainPos){
+    function breakLink(index, relativeIndex, mainPos){ // Function removes @ from stack if it notices a backspace in any of the @.
         var rawText = ""
         txtPlain.text.replace(/<p(?: [^>]*)?>(.*?)<\/p>/,(elm,inside)=>{
             rawText = inside
-        })
-        var count = 0
+        }) // We are using this method vs .getText such that the rawText also includes the spans
+        var count = 0 // Keep track of the count so that we can remove the @ by index
         var popped = false
 
         const ats = rawText.replace(/@<span(?: [^>]*)?>(.*?)<\/span>/g,(elm,inside)=>{
                 count += 1
                 if (index === count-1 && !popped){
                     popped = true
-                    allAts.splice(count-1,1)
+                    allAts.splice(count-1,1) // Removes @ from "allAts" array
                     return "@"+ inside
                 }
                 return elm
@@ -168,7 +168,7 @@ Window {
         pushBeginBack()
     }
 
-    function pushBeginBack(spaces = 1){
+    function pushBeginBack(spaces = 1){ // Function pushes back the "begin" property for any @ that has their begining before the currentCursor.
         allAts = allAts.map((elm)=>{
             if(lastPos<elm.begin){
                 const newElm = elm
@@ -179,7 +179,7 @@ Window {
         })
     }
 
-    function pushBeginForwards(spaces = 1,currPos){
+    function pushBeginForwards(spaces = 1,currPos){ // Function pushes forward the "begin" property for any @ that has their begining before the currentCursor.
         console.debug("pushing the begin forward")
         allAts = allAts.map((elm)=>{
             console.debug(`Cursor Postion == ${currPos} and the ${elm.begin}`)
@@ -192,8 +192,7 @@ Window {
         })
     }
 
-
-    function findWordIndexOfCursor(words, cursorPosition){
+    function findWordIndexOfCursor(words, cursorPosition){ // Function returns the index of the word which the cursor is touching in respect of all of the words in the input.
         const plainText = txtPlain.getText(0,500)
 
         let newCursorPosition = cursorPosition
@@ -212,7 +211,7 @@ Window {
         return returnIndex
     }
 
-    function findWordTouchingCursor(words, cursorPosition){
+    function findWordTouchingCursor(words, cursorPosition){ // Function returns the WORD which the cursor is touching.
         const plainText = txtPlain.getText(0,500)
 //        console.debug(`Before == "${plainText[cursorPosition]}" and After == "${plainText[cursorPosition]}"`)
 //        if (plainText[cursorPosition] === " " && plainText[cursorPosition] === " " ){
