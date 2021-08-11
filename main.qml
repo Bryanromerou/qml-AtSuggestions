@@ -133,7 +133,6 @@ Window {
         const ats = rawText.replace(/@<span(?: [^>]*)?>(.*?)<\/span>/g,(elm,inside)=>{
                 count += 1
                 if (index === count-1 && !popped){
-//                    console.log("IF STATEMENT EXECUTED")
                     popped = true
                     allAts.splice(count-1,1)
                     pushBeginBack(inside.length+2)
@@ -203,7 +202,7 @@ Window {
 
         let newCursorPosition = cursorPosition
         for(let i=0;i<cursorPosition; i++){
-            if (plainText[i]===" ")
+            if (plainText[i]===" " && i<cursorPosition-1)
                 newCursorPosition -= 1
         }
         let letterCount = 0
