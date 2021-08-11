@@ -43,8 +43,6 @@ Window {
     property var allAts: []
     property int wordIdx: 0
     property int totalWords: 0
-    property int key: 0
-
 
 
     function searchElmClicked( user, index)
@@ -56,8 +54,6 @@ Window {
         const specialText = addSpecialText(regularText)
 
         const insertPos = findWordIndexOfCursor(words,txtPlain.cursorPosition)
-
-//        console.debug(findWordIndexOfCursor(words,txtPlain.cursorPosition))
 
         let updatedText = ""
 
@@ -74,7 +70,6 @@ Window {
             "begin":croppedText.length-1,
             "length": regularText.length + 1,
             "text": regularText,
-            "key": key,
             "wordIdx": wordIdx,
             "wordCount": user.name.split(" ").length
         })
@@ -82,7 +77,6 @@ Window {
         txtPlain.text = updatedText
         clearSearchResultElm()
         txtPlain.cursorPosition = txtPlain.getText(0,500).length
-        key += 1
         colorText()
         txtPlain.atFlag = false
     }
