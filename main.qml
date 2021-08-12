@@ -50,7 +50,6 @@ Window {
     function searchElmClicked( user, index) // Click listener for when a suggetion is clicked.
     {
         const plainText = txtPlain.getText(0,500)
-        console.debug(txtPlain.txt)
         const words = plainText.split(" ")
         const croppedText = plainText.slice(0,plainText.length-txtPlain.resultSize+1)
         const regularText = searchResults[index].name
@@ -58,43 +57,42 @@ Window {
 
         const insertPos = findWordIndexOfCursor(words,txtPlain.cursorPosition)
 
+        var rawText = ""
+        var count = 0
+        txtPlain.text.replace(/<p(?: [^>]*)?>(.*?)<\/p>/,(elm,inside)=>{
+            rawText = inside
+        })
+
+        const tempAts = {}
+
+        var newText = rawText.replace(/<span(?: [^>]*)?>(.*?)<\/span>/g,(elm,inside)=>{
+                count += 1
+                tempAts[`temp${count}`] = elm
+                return `temp${count}`
+        })
+        console.debug(newText)
+        count = 0
+        const newWords = newText.split(" ")
+
+
+
         let updatedText = ""
         var skip = 0
 
-        words.forEach((elm,idx)=>{
-            console.debug(elm)
+        newWords.forEach((elm,idx)=>{
             if(idx === insertPos){
-                updatedText += specialText
+                updatedText += "@" + specialText
             }else{
                 updatedText += elm
             }
             updatedText += " "
-//            var combinedWords
-//            allAts.forEach((at,myIdx)=>{
-//                combinedWords = ""
-//                if(myIdx > 0 ){
-//                    combinedWords = at.text + allAts[myIdx-1].text
-//                }
-//                if(at.text === elm || combinedWords === elm){
-//                    if (at.text === elm){
-//                        skip = 1
-//                        updatedText += addSpecialText(at.text)
-//                    }
-//                    else{
-//                        skip = 2
-//                        updatedText += addSpecialText(combinedWords)
-//                    }
-//                }
-//               if(skip<1){
-//                   skip = false
-//                   updatedText += elm
-//                   skip = 0
-//               }
-//               skip -= 1
-//            })
         })
 
-        console.debug(plainText)
+        updatedText = updatedText.replace(/(temp)\w+/g,(elm,inside)=>{
+            count += 1
+            return tempAts[`temp${count}`]
+        })
+
         console.debug(updatedText)
 
         allAts.push({
@@ -108,7 +106,6 @@ Window {
         txtPlain.text = updatedText
         clearSearchResultElm()
         txtPlain.cursorPosition = txtPlain.getText(0,500).length
-        colorText()
         txtPlain.atFlag = false
     }
 
@@ -128,43 +125,20 @@ Window {
         searchResultsElm = []
     }
 
-    function colorText(finalCursorPosition = null){ // Function loops through each word and if word has an index that is also inside of allAts array.
-        let tempText = ""
-        const wordArr = txtPlain.getText(0,500).split(" ")
-        const newWordArr = []
-        wordArr.forEach((word,idx)=>{
-            let tempWord = word
-            let skip = false
-            allAts.forEach((elm)=>{
-                if( elm.wordIdx === idx)
-                    tempWord = "@" + addSpecialText(elm.text)
-                else if(elm.wordIdx+elm.wordCount-1 >= idx && elm.wordIdx < idx)
-                    skip = true
-            })
-            if(!skip)
-                newWordArr.push(tempWord)
-        })
-        txtPlain.text = newWordArr.join(" ")
-        txtPlain.cursorPosition = txtPlain.getText(0,500).length
-    }
-
     function addSpecialText(originalText){ // Function takes in string and returns string back with color span tag
-        return `<font color=\"#0000FF\">${originalText}</font>`
+        return `<span style="color:#0000FF;">${originalText}</span>`
     }
 
     function deleteAt(index){ // Function removes the @ at certain index, corresponding to the allAts array from the TextInput
         const plainText = txtPlain.getText(0,500)
-//        console.debug("Trying to delete item")
         var rawText = ""
         txtPlain.text.replace(/<p(?: [^>]*)?>(.*?)<\/p>/,(elm,inside)=>{
             rawText = inside
         })
-        console.debug(rawText)
         var count = 0
         var popped = false
         const ats = rawText.replace(/@<span(?: [^>]*)?>(.*?)<\/span>/g,(elm,inside)=>{
                 count += 1
-//                console.log(`index == ${index} ; count == ${count-1} ; !popped == ${!popped}`)
                 if (index === count-1 && !popped){
                     popped = true
                     allAts.splice(count-1,1)
@@ -211,7 +185,7 @@ Window {
     }
 
     function pushBeginForwards(spaces = 1){ // Function pushes forward the "begin" property for any @ that has their begining before the currentCursor.
-        console.debug("pushing the begin forward")
+//        console.debug("pushing the begin forward")
         allAts = allAts.map((elm)=>{
             if(lastPos<elm.begin){
                 const newElm = elm
@@ -321,9 +295,9 @@ Window {
                 else if(currText>textOnly.length && currText - textOnly.length<= 1)
                     pushBeginBack()
                 currText = textOnly.length
-                allAts.forEach(elm=>{
-                    console.debug(`${elm.text} \n Begin: ${elm.begin} --- End:${elm.begin+elm.length}`)
-                })
+//                allAts.forEach(elm=>{
+//                    console.debug(`${elm.text} \n Begin: ${elm.begin} --- End:${elm.begin+elm.length}`)
+//                })
 
                 var result = findWordTouchingCursor(words,txtPlain.cursorPosition);
                 atFlag = result[0] === "@"

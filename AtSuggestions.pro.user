@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.15.2, 2021-08-06T18:00:40. -->
+<!-- Written by QtCreator 4.15.2, 2021-08-11T18:00:20. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -740,10 +740,14 @@
      <value type="int">14</value>
     </valuelist>
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
-    <value type="int" key="PE.EnvironmentAspect.Base">2</value>
-    <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.CustomExecutableRunConfiguration</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey"></value>
+    <valuemap type="QVariantMap" key="Ios.device_type">
+     <value type="QString" key="displayName">iPod touch (7th generation), com.apple.CoreSimulator.SimRuntime.iOS-14-5</value>
+     <value type="QString" key="identifier">B74AB824-3B33-4502-A4AA-C6ABF7FB457F</value>
+     <value type="int" key="type">1</value>
+    </valuemap>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Run AtSuggestions on iOS Simulator</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.IosRunConfiguration:/Users/bryanromero/AtSuggestions/AtSuggestions.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/bryanromero/AtSuggestions/AtSuggestions.pro</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
