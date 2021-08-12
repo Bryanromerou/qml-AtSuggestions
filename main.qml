@@ -11,30 +11,37 @@ Window {
     readonly property var users: [
       {
             name:"Lilly",
+            description:"Lilly",
             number:"+13122593776"
       },
       {
             name:"Issac",
+            description:"Isaac",
             number:"+19179926276"
       },
       {
             name:"Sunil",
+            description:"Sunil",
             number:"+6591654067"
       },
       {
             name:"Bryan Romero",
+            description:"BryanRomero",
             number:"+13233971418"
       },
       {
             name:"Romeo Sunshine",
+            description:"RomeoSunshine",
             number:"+13271891468"
       },
       {
             name: "Leoh",
+            description:"Leoh",
             number:"+5493755674135"
       },
       {
             name:"Ishod Ware",
+            description:"IshodWare",
             number:"+135269715384"
       }
     ]
@@ -47,78 +54,43 @@ Window {
     property int lastPos: 0
 
 
-    function searchElmClicked(user, index) // Click listener for when a suggetion is clicked.
+    function searchElmClicked( user, index) // Click listener for when a suggetion is clicked.
     {
-        const plainText = txtPlain.getText(0,500) //This variable shall hold all of the text inside of TextInput NOT INCLUDNING spans
+        const plainText = txtPlain.getText(0,500)
+        console.debug(txtPlain.txt)
         const words = plainText.split(" ")
-        const croppedText = plainText.slice(0,plainText.length-txtPlain.resultSize+1) // So if text is "hey @bry" croppedText is "hey "
-        const userName = searchResults[index].name
-        const specialText = addSpecialText(userName)
-
-        var myCursorPos = txtPlain.cursorPosition
-
-        const insertPos = findWordIndexOfCursor(words,txtPlain.cursorPosition)// Finds the word index of where the cursor currently e.i. "hey my name| is bryan" insertPos == 2
-
-        var rawText = "" //This variable shall hold all of the text inside of TextInput including the spans
-        txtPlain.text.replace(/<p(?: [^>]*)?>(.*?)<\/p>/,(elm,inside)=>{
-            rawText = inside
-        })
-
-        var count = 0
-        const tempAts = {}
-        var newText = rawText.replace(/<span(?: [^>]*)?>(.*?)<\/span>/g,(elm,inside, pos)=>{
-                count += 1
-                tempAts[`temp${count}`] = elm
-                return `temp${count}`
-        }) // Changes "hey @Bryan and @Sunil how are y'all" ------> "hey @temp1 and @temp2 how are y'all"
-
-        count = 0 // resets count
-        const newWords = newText.split(" ")
-
+        const croppedText = plainText.slice(0,plainText.length-txtPlain.resultSize+1)
+        const regularText = searchResults[index].name
+        const insertPos = findWordIndexOfCursor(words,txtPlain.cursorPosition)
         let updatedText = ""
-        newWords.forEach((elm,idx)=>{
+
+        words.forEach((elm,idx)=>{
+            console.debug(elm)
             if(idx === insertPos){
-                updatedText += "@" + specialText
+                updatedText += regularText
             }else{
                 updatedText += elm
             }
             updatedText += " "
         })
 
-        updatedText = updatedText.replace(/(temp)\w+/g,(elm,inside)=>{
-            count += 1
-            return tempAts[`temp${count}`]
-        })
-        console.debug(updatedText)
-
         allAts.push({
-            "begin":txtPlain.cursorPosition-txtPlain.resultSize,
-            "length": userName.length + 1,
-            "text": userName,
+            "begin":lastPos-txtPlain.resultSize,
+            "length": regularText.length + 1,
+            "text": regularText,
             "wordIdx": wordIdx,
             "wordCount": user.name.split(" ").length
         })
+        allAts.sort((elmA,elmB)=>{
+            return elmA.begin - elmB.begin
+        })
 
-        pushBeginForwards(userName.length + 1)
+        pushBeginForwards(regularText.length -txtPlain.resultSize)
         txtPlain.text = updatedText
         clearSearchResultElm()
         txtPlain.cursorPosition = txtPlain.getText(0,500).length
+        colorText()
         txtPlain.atFlag = false
-    }
-
-    function findTrueWordCount(){
-        var rawText = "" //This variable shall hold all of the text inside of TextInput including the spans
-        txtPlain.text.replace(/<p(?: [^>]*)?>(.*?)<\/p>/,(elm,inside)=>{
-            rawText = inside
-        })
-
-        var count = 0
-        var newText = rawText.replace(/<span(?: [^>]*)?>(.*?)<\/span>/g,(elm,inside)=>{
-                count += 1
-                return `temp${count}`
-        }) // Changes "hey @Bryan and @Sunil how are y'all" ------> "hey @temp1 and @temp2 how are y'all"
-        newText = newText.split(" ")
-        totalWords = newText.length
     }
 
     function createSearchResult (user,idx){// Creates a user suggestion element/component
@@ -135,6 +107,41 @@ Window {
         })
         suggestions.height = 0
         searchResultsElm = []
+    }
+
+    function colorText(finalCursorPosition = null){ // Function loops through each word and if word has an index that is also inside of allAts array.
+        let tempText = ""
+        const wordArr = txtPlain.getText(0,500).split(" ")
+        const newWordArr = []
+        let tempWord = ""
+        let skip = 0
+        const plainText = txtPlain.getText(0,500)
+
+        let finalText = ""
+        let isAt = false
+        let letterCount = 0
+        let currAt = ""
+        for(let i = 0; i<plainText.length;i++){
+            allAts.forEach(elm=>{
+                if(elm.begin === i){
+                    isAt = true
+                    letterCount = elm.length - 1
+                    currAt = elm.text
+                }
+            })
+            if(letterCount<1)
+                finalText += plainText[i]
+            else{
+                if(isAt){
+                    isAt = false
+                    finalText += "@" + addSpecialText(currAt) + " "
+                }else
+                    letterCount -= 1
+            }
+        }
+
+        txtPlain.text = finalText +" "
+        txtPlain.cursorPosition = txtPlain.getText(0,500).length
     }
 
     function addSpecialText(originalText){ // Function takes in string and returns string back with color span tag
@@ -182,7 +189,6 @@ Window {
         })
         txtPlain.text = ats + " "
         txtPlain.cursorPosition = mainPos
-        pushBeginBack()
     }
 
     function pushBeginBack(spaces = 1){ // Function pushes back the "begin" property for any @ that has their begining before the currentCursor.
@@ -197,7 +203,6 @@ Window {
     }
 
     function pushBeginForwards(spaces = 1){ // Function pushes forward the "begin" property for any @ that has their begining before the currentCursor.
-//        console.debug("pushing the begin forward")
         allAts = allAts.map((elm)=>{
             if(lastPos<elm.begin){
                 const newElm = elm
@@ -230,7 +235,6 @@ Window {
     function findWordTouchingCursor(words, cursorPosition){ // Function returns the WORD which the cursor is touching.
         const plainText = txtPlain.getText(0,500)
         let newCursorPosition = cursorPosition
-
         for(let i=0;i<cursorPosition; i++){
             if (plainText[i]===" " && i<cursorPosition-1)
                 newCursorPosition -= 1
@@ -297,15 +301,18 @@ Window {
                 const textOnly = getText(0,500)
                 var words = textOnly.split(" ") //Splits the text into an array of words
                 totalWords = words.length
-                findTrueWordCount()
                 if(currText<textOnly.length && textOnly.length - currText<= 1)
                     pushBeginForwards()
                 else if(currText>textOnly.length && currText - textOnly.length<= 1)
                     pushBeginBack()
                 currText = textOnly.length
+                allAts.forEach(elm=>{
+                    console.debug(`${elm.text} \n Begin: ${elm.begin} --- End:${elm.begin+elm.length}`)
+                })
 
                 var result = findWordTouchingCursor(words,txtPlain.cursorPosition);
-                atFlag = result[0] === "@"
+                atFlag = result[0] === "@" // If the word that the cursor is touching starts with a @ it sets the atFlag(such that the suggestions menu should pop up)
+
                 wordIdx = findWordIndexOfCursor(words,txtPlain.cursorPosition);
                 resultSize =  result ? result.length : 0
                 if(atFlag){
@@ -314,7 +321,6 @@ Window {
 
                     if(!result)
                         searchResults = users
-
                     else{
                         users.forEach((user,idx)=>{
                             const names = user.name.split(" ")
