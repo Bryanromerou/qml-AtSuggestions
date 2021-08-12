@@ -50,6 +50,7 @@ Window {
     function searchElmClicked( user, index) // Click listener for when a suggetion is clicked.
     {
         const plainText = txtPlain.getText(0,500)
+        console.debug(txtPlain.txt)
         const words = plainText.split(" ")
         const croppedText = plainText.slice(0,plainText.length-txtPlain.resultSize+1)
         const regularText = searchResults[index].name
@@ -68,29 +69,29 @@ Window {
                 updatedText += elm
             }
             updatedText += " "
-            var combinedWords
-            allAts.forEach((at,myIdx)=>{
-                combinedWords = ""
-                if(myIdx > 0 ){
-                    combinedWords = at.text + allAts[myIdx-1].text
-                }
-                if(at.text === elm || combinedWords === elm){
-                    if (at.text === elm){
-                        skip = 1
-                        updatedText += addSpecialText(at.text)
-                    }
-                    else{
-                        skip = 2
-                        updatedText += addSpecialText(combinedWords)
-                    }
-                }
-               if(skip<1){
-                   skip = false
-                   updatedText += elm
-                   skip = 0
-               }
-               skip -= 1
-            })
+//            var combinedWords
+//            allAts.forEach((at,myIdx)=>{
+//                combinedWords = ""
+//                if(myIdx > 0 ){
+//                    combinedWords = at.text + allAts[myIdx-1].text
+//                }
+//                if(at.text === elm || combinedWords === elm){
+//                    if (at.text === elm){
+//                        skip = 1
+//                        updatedText += addSpecialText(at.text)
+//                    }
+//                    else{
+//                        skip = 2
+//                        updatedText += addSpecialText(combinedWords)
+//                    }
+//                }
+//               if(skip<1){
+//                   skip = false
+//                   updatedText += elm
+//                   skip = 0
+//               }
+//               skip -= 1
+//            })
         })
 
         console.debug(plainText)
