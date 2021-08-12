@@ -68,29 +68,29 @@ Window {
                 updatedText += elm
             }
             updatedText += " "
-            var combinedWords
-            allAts.forEach((at,myIdx)=>{
-                combinedWords = ""
-                if(myIdx > 0 ){
-                    combinedWords = at.text + allAts[myIdx-1].text
-                }
-                if(at.text === elm || combinedWords === elm){
-                    if (at.text === elm){
-                        skip = 1
-                        updatedText += addSpecialText(at.text)
-                    }
-                    else{
-                        skip = 2
-                        updatedText += addSpecialText(combinedWords)
-                    }
-                }
-               if(skip<1){
-                   skip = false
-                   updatedText += elm
-                   skip = 0
-               }
-               skip -= 1
-            })
+//            var combinedWords
+//            allAts.forEach((at,myIdx)=>{
+//                combinedWords = ""
+//                if(myIdx > 0 ){
+//                    combinedWords = at.text + allAts[myIdx-1].text
+//                }
+//                if(at.text === elm || combinedWords === elm){
+//                    if (at.text === elm){
+//                        skip = 1
+//                        updatedText += addSpecialText(at.text)
+//                    }
+//                    else{
+//                        skip = 2
+//                        updatedText += addSpecialText(combinedWords)
+//                    }
+//                }
+//               if(skip<1){
+//                   skip = false
+//                   updatedText += elm
+//                   skip = 0
+//               }
+//               skip -= 1
+//            })
         })
 
         console.debug(plainText)
