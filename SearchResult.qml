@@ -5,7 +5,7 @@ Item {
     property var user: null
     property int index: 0
     signal clicked(var user, var index)
-    height: 20
+    height: 40
     width:parent.width
     Rectangle{
         anchors.fill: parent
@@ -16,6 +16,11 @@ Item {
             color:"white"
             id: screenName
             text: user.name
+        }
+        Text {
+            id: number
+            text: user.number
+            anchors.top: screenName.bottom
         }
 
         MouseArea{

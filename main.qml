@@ -94,7 +94,7 @@ Window {
         var component = Qt.createComponent("SearchResult.qml")
         var temp = component.createObject(suggestionsColm,{"user":user,"index":idx})
         temp.clicked.connect(searchElmClicked)
-        suggestions.height = suggestions.height + 25
+        suggestions.height = suggestions.height + 45
         searchResultsElm.push(temp)
     }
 
@@ -189,7 +189,8 @@ Window {
     }
 
     function breakLinkWithAddition(index, relativeIndex, mainPos){ // [WIP] Function should break the link if the user inputs anything inside of an existing @
-        }
+
+    }
 
     function pushBeginBack(spaces = 1){ // Function pushes back the "begin" property for any @ that has their begining before the currentCursor.
         allAts = allAts.map((elm)=>{
@@ -283,7 +284,7 @@ Window {
 
     Rectangle{
         id:frame
-        y:root.height/3
+        y:root.height/2
         width:parent.width
         height: txtPlain.contentHeight*1.4
         border.color: "gray"
@@ -321,6 +322,15 @@ Window {
                     pushBeginForwards()
                 else if(currText>textOnly.length && currText - textOnly.length<= 1)
                     pushBeginBack()
+
+                if(currText<textOnly.length && allAts.length > 1 ){
+                    allAts.forEach((elm,idx)=>{
+                        if(elm.begin <= txtPlain.cursorPosition && elm.begin+elm.length >= txtPlain.cursorPosition){
+                           breakLink(idx,txtPlain.cursorPosition-elm.begin, txtPlain.cursorPosition)
+                           console.debug("Trying to break link")
+                        }
+                    })
+                }
                 currText = textOnly.length
 
 
@@ -339,15 +349,23 @@ Window {
                         users.forEach((user,idx)=>{
                             const names = user.name.split(" ")
                             var addedUser = false
-                            names.forEach((name)=>{
-                                const match = name.toLowerCase().startsWith(result.toLowerCase())
-                                if(match){
-                                    if(!addedUser){
-                                        addedUser = true
-                                        searchResults.push(user)
+                            const regExp1 = new RegExp( "("+ result +")\\w+","g")
+                            const match2 = user.number.match(regExp1)
+                            if (match2){
+                                addedUser = true
+                                searchResults.push(user)
+                            }
+                            if(!addedUser){
+                                names.forEach((name)=>{
+                                    const match = name.toLowerCase().startsWith(result.toLowerCase())
+                                    if(match){
+                                        if(!addedUser){
+                                            addedUser = true
+                                            searchResults.push(user)
+                                        }
                                     }
-                                }
-                            })
+                                })
+                            }
                         })
                     }
 
